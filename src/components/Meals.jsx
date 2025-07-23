@@ -1,22 +1,24 @@
-import { useState, useEffect } from "react";
 import MealItem from "./MealItem.jsx";
+import useHttp from "../hooks/useHttp.js";
+
+// creating the config outside of the component function to stop an infinite
+// loop when sending the httpRequest
+const requestConfig = {};
 
 export default function Meals({  }) {
-    const [ loadedMeals, setLoadedMeals ] = useState([]);
-    
-    // useEffect to load the meals and prevent reloading every time
-    useEffect(() => {
-        // async function inside component function is allowed so we can use await
-        async function fetchMeals() {
-            const response = await fetch('http://localhost:3000/meals');
-            if (!response.ok) {
-                // handle error
-            }
-            const meals = await response.json();
-            setLoadedMeals(meals);
-        }
-        fetchMeals();
-    }, []);
+    // using the custom useHttp hook to retrieve the meal data
+    // destructuring the returned data into a const
+    const { 
+        data: loadedMeals,
+        isLoading,
+        error
+        // sending the url, an empty object as is GET request and initial data
+        // for the meals
+    } = useHttp('http://localhost:3000/meals', requestConfig, []);
+
+    if (isLoading) {
+        return <p>Fetching meals...</p>;
+    }
 
     return (
         <ul id='meals'>
