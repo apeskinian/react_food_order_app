@@ -5,6 +5,7 @@ import App from './App.jsx'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
+  // strict mode enabled so every thing is run twice for development
   <React.StrictMode>
     <App />
   </React.StrictMode>,
