@@ -1,5 +1,6 @@
 import MealItem from "./MealItem.jsx";
 import useHttp from "../hooks/useHttp.js";
+import ErrorMessage from "./Error.jsx";
 
 // creating the config outside of the component function to stop an infinite
 // loop when sending the httpRequest
@@ -16,8 +17,14 @@ export default function Meals({  }) {
         // for the meals
     } = useHttp('http://localhost:3000/meals', requestConfig, []);
 
+    // setting loading message if the isLoading is set from the hook
     if (isLoading) {
-        return <p>Fetching meals...</p>;
+        return <p className="center">Fetching meals...</p>;
+    }
+
+    // setting error message if there is an error sent from the hook
+    if (error) {
+        return <ErrorMessage title='Failed to fetch meals...' message={error} />
     }
 
     return (
