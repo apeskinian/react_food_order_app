@@ -3,7 +3,7 @@ import Input from "./UI/Input.jsx";
 import Button from "./UI/Button.jsx";
 import CartContext from "../store/CartContext";
 import UserProgressContext from "../store/UserProgressContext.jsx";
-import { useContext, useActionState } from "react";
+import { useContext } from "react";
 import { currencyFormatter } from "../util/formatting.js";
 import useHttp from "../hooks/useHttp.js";
 import ErrorMessage from "./Error.jsx";
@@ -27,6 +27,7 @@ export default function Checkout() {
     // content further down
     const {
         data,
+        isLoading: isSending,
         error,
         sendRequest,
         clearData
@@ -46,15 +47,19 @@ export default function Checkout() {
         clearData();
     }
 
-    // using form actions
-    async function checkoutAction(prevState, fd) {
+    // manual form validation
+    function handleSubmit(event) {
+        // preventing the submission of the form
+        event.preventDefault();
+        // getting the form data which uses the name tag
+        const fd = new FormData(event.target);
         // create an object containing the form data
         // { email: tesstyuza@gmail.com }
         const customerData = Object.fromEntries(fd.entries());
 
         // manually call sendRequest and adding the order info as the data
         // argument which will then be added to the config as the body
-        await sendRequest(
+        sendRequest(
             JSON.stringify({
                 order: {
                     items: cartCtx.items,
@@ -63,8 +68,6 @@ export default function Checkout() {
             })
         );
     }
-    // using useActionState to get the pending element
-    const [ formState, formAction, isSending ] = useActionState(checkoutAction, null);
 
     let actions = (
         <>
@@ -92,7 +95,7 @@ export default function Checkout() {
 
     return (
         <Modal open={userProgressCtx.progress === 'checkout'} onClose={handleClose}>
-            <form action={formAction}>
+            <form onSubmit={handleSubmit}>
                 <h2>Checkout</h2>
                 <p>Total Amount: {currencyFormatter.format(cartTotal)}</p>
                 <Input label='Full Name' type='text' id='name' />
