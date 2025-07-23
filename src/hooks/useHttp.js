@@ -22,7 +22,11 @@ export default function useHttp(url, config, initialData) {
     const [ isLoading, setIsLoading ] = useState(false);
     const [ error, setError ] = useState();
 
-    const sendRequest = useCallback(async function sendRequest() {
+    function clearData() {
+        setData(initialData);
+    }
+
+    const sendRequest = useCallback(async function sendRequest(data) {
         // set loading state when async function starts
         setIsLoading(true);
         // begin a try catch to get the data
@@ -31,7 +35,9 @@ export default function useHttp(url, config, initialData) {
             // above generic sendHttpRequest function
             // using await otherwise a promise is stored in resData until
             // it is resolved
-            const resData = await sendHttpRequest(url, config)
+            // we also add any data that was sent to the config into the body
+            // by spreading the config into a new object adding the body
+            const resData = await sendHttpRequest(url, {...config, body: data});
             // setting the date state to the returned data
             setData(resData)
         } catch (error) {
@@ -58,6 +64,7 @@ export default function useHttp(url, config, initialData) {
         data,
         isLoading,
         error,
-        sendRequest
+        sendRequest,
+        clearData
     }
 }
